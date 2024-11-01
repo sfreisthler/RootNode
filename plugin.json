@@ -1,0 +1,16 @@
+{
+  "slug": "RootNode",
+  "name": "RootNode",
+  "version": "2.0.0",
+  "license": "GPL-3.0-only",
+  "brand": "RootNode",
+  "author": "Sadie Freisthler",
+  "authorEmail": "sfreisthler@gmail.com",
+  "authorUrl": "sadiefreisthler.com",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": []
+}
