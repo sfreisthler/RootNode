@@ -27,19 +27,36 @@ struct Rectifier : Module {
 
 	Rectifier() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(MANUAL_PARAM_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(CV_PARAM_PARAM, 0.f, 1.f, 0.f, "");
-		configInput(SIGNAL_INPUT_INPUT, "");
-		configInput(CV_INPUT_INPUT, "");
-		configOutput(FWR_OUTPUT_OUTPUT, "");
-		configOutput(FWRI_OUTPUT_OUTPUT, "");
-		configOutput(PHR_OUTPUT_OUTPUT, "");
-		configOutput(PHRI_OUTPUT_OUTPUT, "");
-		configOutput(NHR_OUTPUT_OUTPUT, "");
-		configOutput(NHRI_OUTPUT_OUTPUT, "");
+		configParam(MANUAL_PARAM, 0.f, 1.f, 0.f, "");
+		configParam(CV_PARAM, 0.f, 1.f, 0.f, "");
+		configInput(SIGNAL_INPUT, "");
+		configInput(CV_INPUT, "");
+		configOutput(FWR_OUTPUT, "");
+		configOutput(FWRI_OUTPUT, "");
+		configOutput(PHR_OUTPUT, "");
+		configOutput(PHRI_OUTPUT, "");
+		configOutput(NHR_OUTPUT, "");
+		configOutput(NHRI_OUTPUT, "");
 	}
 
 	void process(const ProcessArgs& args) override {
+
+		float manual_axis = params[MANUAL_PARAM].getValue();
+		float cv_axis = params[CV_PARAM].getValue();
+
+		float input = inputs[SIGNAL_INPUT].getVoltage();
+
+		float full = input < 0 ? -input : input;
+		float half_pos = input < 0 ? 0 : input;
+		float half_neg = input > 0? 0 : input;
+
+		outputs[PHR_OUTPUT].setVoltage(half_pos);
+		outputs[FWR_OUTPUT].setVoltage(full);
+		outputs[NHR_OUTPUT].setVoltage(half_neg);
+		outputs[FWRI_OUTPUT].setVoltage(-full);
+		outputs[PHRI_OUTPUT].setVoltage(-half_pos);
+		outputs[NHRI_OUTPUT].setVoltage(-half_neg);
+
 	}
 };
 
