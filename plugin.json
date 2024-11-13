@@ -12,5 +12,18 @@
   "sourceUrl": "",
   "donateUrl": "",
   "changelogUrl": "",
-  "modules": []
+  "modules": [
+    {
+      "slug": "Rectifier",
+      "name": "Rectifier",
+      "description": "",
+      "tags": []
+    },
+    {
+      "slug": "SubharmonicGenerator",
+      "name": "Subharmonic Generator",
+      "description": "",
+      "tags": []
+    }
+  ]
 }

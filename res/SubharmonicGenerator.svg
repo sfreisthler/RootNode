@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="30.48mm"
+   height="128.5mm"
+   viewBox="0 0 30.48 128.5"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="SubharmonicGenerator.svg"
+   inkscape:version="1.1 (c4e8f9e, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.1290528"
+     inkscape:cx="32.327982"
+     inkscape:cy="260.8381"
+     inkscape:window-width="1440"
+     inkscape:window-height="847"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs2">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter854"
+       x="-0.015623902"
+       y="-0.0038626545"
+       width="1.0312478"
+       height="1.0077253">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.14163066"
+         id="feGaussianBlur856" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#c8c8c8;fill-opacity:1;stroke-width:0.2"
+       id="rect888"
+       width="30.48"
+       height="128.5"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="components"
+     style="display:inline;filter:url(#filter854)">
+    <circle
+       style="font-variation-settings:'wght' 700;fill:#0000ff;fill-opacity:1;stroke-width:0.2"
+       id="path3597-06-8"
+       cx="15.24"
+       cy="49.023891"
+       r="4"
+       inkscape:label="OSC" />
+    <circle
+       style="font-variation-settings:'wght' 700;fill:#0000ff;fill-opacity:1;stroke-width:0.2"
+       id="path3597-06-8-1"
+       cx="15.24"
+       cy="94.078156"
+       r="4"
+       inkscape:label="SUB" />
+    <circle
+       style="font-variation-settings:'wght' 700;fill:#ff0000;fill-opacity:1;stroke-width:0.2"
+       id="path3597-1"
+       cx="15.24"
+       cy="26.496756"
+       r="4"
+       inkscape:label="FREQ" />
+    <circle
+       style="font-variation-settings:'wght' 700;fill:#ff0000;fill-opacity:1;stroke-width:0.2"
+       id="path3597-1-6"
+       cx="15.24"
+       cy="71.551025"
+       r="4"
+       inkscape:label="SUB" />
+  </g>
+</svg>
