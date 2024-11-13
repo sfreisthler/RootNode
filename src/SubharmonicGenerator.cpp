@@ -48,7 +48,8 @@ struct SubharmonicGenerator : Module {
 		SUB21_PARAM,
 		SUB12_PARAM,
 		SUB22_PARAM,
-		WAVEFORM_PARAM,
+		WAVEFORM1_PARAM,
+		WAVEFORM2_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -89,11 +90,13 @@ struct SubharmonicGenerator : Module {
 		configOutput(SUB12_OUTPUT, "");
 		configOutput(SUB22_OUTPUT, "");
 
-		configSwitch(WAVEFORM_PARAM, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
+		configSwitch(WAVEFORM1_PARAM, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
+		configSwitch(WAVEFORM2_PARAM, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
 	}
 
 	void process(const ProcessArgs& args) override {
-		float waveform = params[WAVEFORM_PARAM].getValue();
+		float waveform1 = params[WAVEFORM1_PARAM].getValue();
+		float waveform2 = params[WAVEFORM2_PARAM].getValue();
 
 		float osc1Freq = params[FREQ1_PARAM].getValue();
 		float sub11Selector = std::floor(params[SUB11_PARAM].getValue());
@@ -133,29 +136,29 @@ struct SubharmonicGenerator : Module {
 		sub22.freq = sub22Freq;
 		sub22.process(args.sampleTime);
 
-		if (waveform == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
+		if (waveform1 == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.sqr());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.sqr());
-		} else if (waveform == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
+		} else if (waveform1 == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
-		} else if (waveform == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
+		} else if (waveform1 == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.saw());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
 		}
 
-		if (waveform == 2.0f and outputs[OSC2_OUTPUT].isConnected()) {
+		if (waveform2 == 2.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
 			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.sqr());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.sqr());
-		} else if (waveform == 1.0f and outputs[OSC2_OUTPUT].isConnected()) {
+		} else if (waveform2 == 1.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
 			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
-		} else if (waveform == 0.0f and outputs[OSC2_OUTPUT].isConnected()) {
+		} else if (waveform2 == 0.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.saw());
 			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
@@ -188,7 +191,8 @@ struct SubharmonicGeneratorWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.827, 115.284)), module, SubharmonicGenerator::SUB12_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.133, 115.284)), module, SubharmonicGenerator::SUB22_OUTPUT));
 
-		addParam(createParamCentered<CKSSThree>(mm2px(Vec(30, 60.0)), module, SubharmonicGenerator::WAVEFORM_PARAM));
+		addParam(createParamCentered<CKSSThree>(mm2px(Vec(30, 60.0)), module, SubharmonicGenerator::WAVEFORM1_PARAM));
+		addParam(createParamCentered<CKSSThree>(mm2px(Vec(30, 90.0)), module, SubharmonicGenerator::WAVEFORM2_PARAM));
 	}
 };
 
