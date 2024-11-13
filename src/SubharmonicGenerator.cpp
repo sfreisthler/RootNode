@@ -42,17 +42,25 @@ struct VoltageControlledOscillator {
 
 struct SubharmonicGenerator : Module {
 	enum ParamId {
-		FREQ_PARAM,
+		FREQ1_PARAM,
+		FREQ2_PARAM,
+		SUB11_PARAM,
+		SUB21_PARAM,
+		SUB12_PARAM,
+		SUB22_PARAM,
 		WAVEFORM_PARAM,
-		SUB_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
 		INPUTS_LEN
 	};
 	enum OutputId {
-		OSC_OUTPUT,
-		SUB_OUTPUT,
+		OSC1_OUTPUT,
+		OSC2_OUTPUT,
+		SUB11_OUTPUT,
+		SUB21_OUTPUT,
+		SUB12_OUTPUT,
+		SUB22_OUTPUT,
 		OUTPUTS_LEN
 	};
 	enum LightId {
@@ -60,47 +68,56 @@ struct SubharmonicGenerator : Module {
 	};
 
 	VoltageControlledOscillator oscillator1;
-	VoltageControlledOscillator sub1;
+	VoltageControlledOscillator sub11;
 
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(FREQ_PARAM, 262.f, 4186.f, 0.f, ""); // frequency range from middle c to four octaves above
+		configParam(FREQ1_PARAM, 262.f, 4186.f, 0.f, "");
+		configParam(FREQ2_PARAM, 262.f, 4186.f, 0.f, "");
+		configParam(SUB11_PARAM, 1.f, 16.f, 1.f, "");
+		configParam(SUB21_PARAM, 1.f, 16.f, 1.f, "");
+		configParam(SUB12_PARAM, 1.f, 16.f, 1.f, "");
+		configParam(SUB22_PARAM, 1.f, 16.f, 1.f, "");
+		configOutput(OSC1_OUTPUT, "");
+		configOutput(OSC2_OUTPUT, "");
+		configOutput(SUB11_OUTPUT, "");
+		configOutput(SUB21_OUTPUT, "");
+		configOutput(SUB12_OUTPUT, "");
+		configOutput(SUB22_OUTPUT, "");
+
 		configSwitch(WAVEFORM_PARAM, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
-		configParam(SUB_PARAM, 1.f, 16.f, 1.f, "");
-		configOutput(OSC_OUTPUT, "");
-		configOutput(SUB_OUTPUT, "");
 	}
 
 	void process(const ProcessArgs& args) override {
-		float osc1Freq = params[FREQ_PARAM].getValue();
+		float osc1Freq = params[FREQ1_PARAM].getValue();
 		float waveform = params[WAVEFORM_PARAM].getValue();
-		float sub1Selector = std::floor(params[SUB_PARAM].getValue());
-		float sub1Freq = osc1Freq / sub1Selector;
+		float sub11Selector = std::floor(params[SUB11_PARAM].getValue());
+		float sub11Freq = osc1Freq / sub11Selector;
 
 		// add cv input here
 
 		osc1Freq = clamp(osc1Freq, 0.f, args.sampleRate / 2.f);
-		sub1Freq = clamp(sub1Freq, 0.f, args.sampleRate / 2.f);
+		sub11Freq = clamp(sub11Freq, 0.f, args.sampleRate / 2.f);
 
 		oscillator1.freq = osc1Freq;
 		oscillator1.process(args.sampleTime);
 
-		sub1.freq = sub1Freq;
-		sub1.process(args.sampleTime);
+		sub11.freq = sub11Freq;
+		sub11.process(args.sampleTime);
 
-		if (waveform == 2.0f and outputs[OSC_OUTPUT].isConnected()) {
-			outputs[OSC_OUTPUT].setVoltage(5.f * oscillator1.sqr());
-			outputs[SUB_OUTPUT].setVoltage(5.f * sub1.sqr());
-		} else if (waveform == 1.0f and outputs[OSC_OUTPUT].isConnected()) {
-			outputs[OSC_OUTPUT].setVoltage(5.f * oscillator1.sqr());
-			outputs[SUB_OUTPUT].setVoltage(5.f * sub1.saw());
-		} else if (waveform == 0.0f and outputs[OSC_OUTPUT].isConnected()) {
-			outputs[OSC_OUTPUT].setVoltage(5.f * oscillator1.saw());
-			outputs[SUB_OUTPUT].setVoltage(5.f * sub1.saw());
+		if (waveform == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
+			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.sqr());
+		} else if (waveform == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
+			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
+		} else if (waveform == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
+			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.saw());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
 		}
-
 	}
 };
+
 
 struct SubharmonicGeneratorWidget : ModuleWidget {
 	SubharmonicGeneratorWidget(SubharmonicGenerator* module) {
@@ -112,13 +129,21 @@ struct SubharmonicGeneratorWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 26.497)), module, SubharmonicGenerator::FREQ_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(15.24, 71.551)), module, SubharmonicGenerator::SUB_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(18.585, 13.216)), module, SubharmonicGenerator::FREQ1_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(41.89, 13.216)), module, SubharmonicGenerator::FREQ2_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(18.827, 54.043)), module, SubharmonicGenerator::SUB11_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(42.133, 54.043)), module, SubharmonicGenerator::SUB21_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(18.827, 94.87)), module, SubharmonicGenerator::SUB12_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(42.133, 94.87)), module, SubharmonicGenerator::SUB22_PARAM));
 
-		addParam(createParamCentered<CKSSThree>(mm2px(Vec(15.24, 60.0)), module, SubharmonicGenerator::WAVEFORM_PARAM));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.827, 33.63)), module, SubharmonicGenerator::OSC1_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.133, 33.63)), module, SubharmonicGenerator::OSC2_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.827, 74.457)), module, SubharmonicGenerator::SUB11_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.133, 74.457)), module, SubharmonicGenerator::SUB21_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.827, 115.284)), module, SubharmonicGenerator::SUB12_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.133, 115.284)), module, SubharmonicGenerator::SUB22_OUTPUT));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24, 49.024)), module, SubharmonicGenerator::OSC_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(15.24, 94.078)), module, SubharmonicGenerator::SUB_OUTPUT));
+		addParam(createParamCentered<CKSSThree>(mm2px(Vec(30, 60.0)), module, SubharmonicGenerator::WAVEFORM_PARAM));
 	}
 };
 

@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="30.48mm"
+   width="60.959999mm"
    height="128.5mm"
-   viewBox="0 0 30.48 128.5"
+   viewBox="0 0 60.96 128.5"
    version="1.1"
    id="svg5"
    sodipodi:docname="SubharmonicGenerator.svg"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.1290528"
-     inkscape:cx="32.327982"
-     inkscape:cy="260.8381"
+     inkscape:zoom="1.1492115"
+     inkscape:cx="153.58357"
+     inkscape:cy="250.17153"
      inkscape:window-width="1440"
      inkscape:window-height="847"
      inkscape:window-x="0"
@@ -38,24 +38,38 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter854"
-       x="-0.015623902"
-       y="-0.0038626545"
-       width="1.0312478"
-       height="1.0077253">
+       x="-0.042489199"
+       y="-0.042489199"
+       width="1.0849784"
+       height="1.0849784">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="0.14163066"
          id="feGaussianBlur856" />
     </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter854-1"
+       x="-0.042489199"
+       y="-0.042489199"
+       width="1.0849784"
+       height="1.0849784">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.14163066"
+         id="feGaussianBlur856-5" />
+    </filter>
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     style="display:inline">
     <rect
-       style="fill:#c8c8c8;fill-opacity:1;stroke-width:0.2"
+       style="fill:#c8c8c8;fill-opacity:1;stroke-width:0.282843"
        id="rect888"
-       width="30.48"
+       width="60.959999"
        height="128.5"
        x="0"
        y="0" />
@@ -66,32 +80,88 @@
      inkscape:label="components"
      style="display:inline;filter:url(#filter854)">
     <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#0000ff;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-06-8-1-0-2"
+       cx="42.132587"
+       cy="115.28359"
+       inkscape:label="SUB22"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#ff0000;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-1-6-8-1"
+       cx="42.132587"
+       cy="94.870163"
+       inkscape:label="SUB22"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#0000ff;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-06-8-10"
+       cx="42.132587"
+       cy="33.629845"
+       inkscape:label="OSC2"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#0000ff;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-06-8-1-1"
+       cx="42.132587"
+       cy="74.456718"
+       inkscape:label="SUB21"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#ff0000;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-1-8"
+       cx="41.890408"
+       cy="13.216408"
+       inkscape:label="FREQ2"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#ff0000;fill-opacity:1;stroke-width:0.2;filter:url(#filter854-1)"
+       id="path3597-1-6-7"
+       cx="42.132587"
+       cy="54.043282"
+       inkscape:label="SUB21"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#0000ff;fill-opacity:1;stroke-width:0.2;filter:url(#filter854)"
+       id="path3597-06-8-1-0"
+       cx="18.827414"
+       cy="115.28359"
+       inkscape:label="SUB12"
+       r="4" />
+    <circle
+       style="font-variation-settings:'wght' 700;display:inline;fill:#ff0000;fill-opacity:1;stroke-width:0.2;filter:url(#filter854)"
+       id="path3597-1-6-8"
+       cx="18.827414"
+       cy="94.870163"
+       inkscape:label="SUB12"
+       r="4" />
+    <circle
        style="font-variation-settings:'wght' 700;fill:#0000ff;fill-opacity:1;stroke-width:0.2"
        id="path3597-06-8"
-       cx="15.24"
-       cy="49.023891"
-       r="4"
-       inkscape:label="OSC" />
+       cx="18.827414"
+       cy="33.629845"
+       inkscape:label="OSC1"
+       r="4" />
     <circle
        style="font-variation-settings:'wght' 700;fill:#0000ff;fill-opacity:1;stroke-width:0.2"
        id="path3597-06-8-1"
-       cx="15.24"
-       cy="94.078156"
-       r="4"
-       inkscape:label="SUB" />
+       cx="18.827414"
+       cy="74.456718"
+       inkscape:label="SUB11"
+       r="4" />
     <circle
        style="font-variation-settings:'wght' 700;fill:#ff0000;fill-opacity:1;stroke-width:0.2"
        id="path3597-1"
-       cx="15.24"
-       cy="26.496756"
-       r="4"
-       inkscape:label="FREQ" />
+       cx="18.585236"
+       cy="13.216408"
+       inkscape:label="FREQ1"
+       r="4" />
     <circle
        style="font-variation-settings:'wght' 700;fill:#ff0000;fill-opacity:1;stroke-width:0.2"
        id="path3597-1-6"
-       cx="15.24"
-       cy="71.551025"
-       r="4"
-       inkscape:label="SUB" />
+       cx="18.827414"
+       cy="54.043282"
+       inkscape:label="SUB11"
+       r="4" />
   </g>
 </svg>
