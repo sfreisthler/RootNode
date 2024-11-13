@@ -68,7 +68,11 @@ struct SubharmonicGenerator : Module {
 	};
 
 	VoltageControlledOscillator oscillator1;
+	VoltageControlledOscillator oscillator2;
 	VoltageControlledOscillator sub11;
+	VoltageControlledOscillator sub12;
+	VoltageControlledOscillator sub21;
+	VoltageControlledOscillator sub22;
 
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -89,31 +93,72 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float osc1Freq = params[FREQ1_PARAM].getValue();
 		float waveform = params[WAVEFORM_PARAM].getValue();
+
+		float osc1Freq = params[FREQ1_PARAM].getValue();
 		float sub11Selector = std::floor(params[SUB11_PARAM].getValue());
 		float sub11Freq = osc1Freq / sub11Selector;
+		float sub12Selector = std::floor(params[SUB12_PARAM].getValue());
+		float sub12Freq = osc1Freq / sub12Selector;
+
+		float osc2Freq = params[FREQ2_PARAM].getValue();
+		float sub21Selector = std::floor(params[SUB21_PARAM].getValue());
+		float sub21Freq = osc2Freq / sub21Selector;
+		float sub22Selector = std::floor(params[SUB22_PARAM].getValue());
+		float sub22Freq = osc2Freq / sub22Selector;
 
 		// add cv input here
 
 		osc1Freq = clamp(osc1Freq, 0.f, args.sampleRate / 2.f);
+		osc2Freq = clamp(osc2Freq, 0.f, args.sampleRate / 2.f);
+
 		sub11Freq = clamp(sub11Freq, 0.f, args.sampleRate / 2.f);
+		sub12Freq = clamp(sub12Freq, 0.f, args.sampleRate / 2.f);
+		sub21Freq = clamp(sub21Freq, 0.f, args.sampleRate / 2.f);
+		sub22Freq = clamp(sub22Freq, 0.f, args.sampleRate / 2.f);
 
 		oscillator1.freq = osc1Freq;
 		oscillator1.process(args.sampleTime);
 
+		oscillator2.freq = osc2Freq;
+		oscillator2.process(args.sampleTime);
+
+
 		sub11.freq = sub11Freq;
 		sub11.process(args.sampleTime);
+		sub12.freq = sub12Freq;
+		sub12.process(args.sampleTime);
+		sub21.freq = sub21Freq;
+		sub21.process(args.sampleTime);
+		sub22.freq = sub22Freq;
+		sub22.process(args.sampleTime);
 
 		if (waveform == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.sqr());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.sqr());
 		} else if (waveform == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
 		} else if (waveform == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.saw());
 			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
+		}
+
+		if (waveform == 2.0f and outputs[OSC2_OUTPUT].isConnected()) {
+			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.sqr());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.sqr());
+		} else if (waveform == 1.0f and outputs[OSC2_OUTPUT].isConnected()) {
+			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
+		} else if (waveform == 0.0f and outputs[OSC2_OUTPUT].isConnected()) {
+			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.saw());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
 		}
 	}
 };

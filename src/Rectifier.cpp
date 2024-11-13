@@ -27,7 +27,7 @@ struct Rectifier : Module {
 
 	Rectifier() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(MANUAL_PARAM, 0.f, 1.f, 0.f, "");
+		configParam(MANUAL_PARAM, -10.f, 10.f, 0.f, "");
 		configParam(CV_PARAM, 0.f, 1.f, 0.f, "");
 		configInput(SIGNAL_INPUT, "");
 		configInput(CV_INPUT, "");
@@ -46,10 +46,11 @@ struct Rectifier : Module {
 
 		float input = inputs[SIGNAL_INPUT].getVoltage();
 
-		float full = input < 0 ? -input : input;
-		float half_pos = input < 0 ? 0 : input;
-		float half_neg = input > 0? 0 : input;
+		float full = input < manual_axis ? manual_axis + std::fabs(input) : input;
+		float half_pos = input < manual_axis ? manual_axis + std::fabs(input) : input;
+		float half_neg = input > manual_axis ? manual_axis - std::fabs(input) : input;
 
+		// set output voltages
 		outputs[PHR_OUTPUT].setVoltage(half_pos);
 		outputs[FWR_OUTPUT].setVoltage(full);
 		outputs[NHR_OUTPUT].setVoltage(half_neg);
