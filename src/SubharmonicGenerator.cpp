@@ -137,25 +137,16 @@ struct SubharmonicGenerator : Module {
 
 		float osc1Freq = params[FREQ1_PARAM].getValue();
 		float sub11Selector = std::floor(params[SUB11_PARAM].getValue());
-		float sub11Freq = osc1Freq / sub11Selector;
 		float sub12Selector = std::floor(params[SUB12_PARAM].getValue());
-		float sub12Freq = osc1Freq / sub12Selector;
 
 		float osc2Freq = params[FREQ2_PARAM].getValue();
 		float sub21Selector = std::floor(params[SUB21_PARAM].getValue());
-		float sub21Freq = osc2Freq / sub21Selector;
 		float sub22Selector = std::floor(params[SUB22_PARAM].getValue());
-		float sub22Freq = osc2Freq / sub22Selector;
 
 		// add cv input here
 
 		osc1Freq = clamp(osc1Freq, 0.f, args.sampleRate / 2.f);
 		osc2Freq = clamp(osc2Freq, 0.f, args.sampleRate / 2.f);
-
-		sub11Freq = clamp(sub11Freq, 0.f, args.sampleRate / 2.f);
-		sub12Freq = clamp(sub12Freq, 0.f, args.sampleRate / 2.f);
-		sub21Freq = clamp(sub21Freq, 0.f, args.sampleRate / 2.f);
-		sub22Freq = clamp(sub22Freq, 0.f, args.sampleRate / 2.f);
 
 		oscillator1.freq = osc1Freq;
 		oscillator1.process(args.sampleTime);
