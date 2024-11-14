@@ -4,22 +4,40 @@
 
 struct VoltageControlledOscillator {
     float phase = 0.f;
+	float sub1Phase = 0.f;
+	float sub2Phase = 0.f;
     float freq = 0.f;
+	float sub1Selector = 1.f;
+	float sub2Selector = 1.f;
 
     dsp::MinBlepGenerator<16, 16, float> sawMinBlep;
     dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
 
     float sawValue = 0.f;
     float sqrValue = 0.f;
+	float sub1SqrValue = 0.f;
+	float sub1SawValue = 0.f;
+	float sub2SqrValue = 0.f;
+	float sub2SawValue = 0.f;
 
     void process(float deltaTime) {
         // Advance phase
         float deltaPhase = simd::clamp(freq * deltaTime, 0.f, 0.35f);
+		float deltaSub1Phase = simd::clamp(freq * deltaTime / sub1Selector, 0.f, 0.35f);
+		float deltaSub2Phase = simd::clamp(freq * deltaTime / sub2Selector, 0.f, 0.35f);
         phase += deltaPhase;
+		sub1Phase += deltaSub1Phase;
+		sub2Phase += deltaSub2Phase;
 
        // Wrap phase to stay within [0, 1]
         if (phase >= 1.0f)
             phase -= 1.0f;
+		
+		if (sub1Phase >= 1.0f)
+			sub1Phase -= 1.0f;
+
+		if (sub2Phase >= 1.0f)
+			sub2Phase -= 1.0f;
 
         // Calculate square wave (±1) based on phase
         sqrValue = phase < 0.5f ? 1.f : -1.f;
@@ -28,6 +46,13 @@ struct VoltageControlledOscillator {
         // Calculate sawtooth wave (linear ramp from -1 to 1)
         sawValue = 2.f * phase - 1.f;
         sawValue += sawMinBlep.process();
+
+		sub1SqrValue = sub1Phase < 0.5f ? 1.f : -1.f;
+		sub2SqrValue = sub2Phase < 0.5f ? 1.f : -1.f;
+
+		sub1SawValue = 2.f * sub1Phase - 1.f;
+		sub2SawValue = 2.f * sub2Phase - 1.f;
+			
     }
 
     float saw() {
@@ -37,6 +62,22 @@ struct VoltageControlledOscillator {
     float sqr() {
         return sqrValue;
     }
+
+	float sub1Saw() {
+		return sub1SawValue;
+	}
+
+	float sub1Sqr() {
+		return sub1SqrValue;
+	}
+
+	float sub2Saw() {
+		return sub2SawValue;
+	}
+
+	float sub2Sqr() {
+		return sub2SqrValue;
+	}
 };
 
 
@@ -70,10 +111,6 @@ struct SubharmonicGenerator : Module {
 
 	VoltageControlledOscillator oscillator1;
 	VoltageControlledOscillator oscillator2;
-	VoltageControlledOscillator sub11;
-	VoltageControlledOscillator sub12;
-	VoltageControlledOscillator sub21;
-	VoltageControlledOscillator sub22;
 
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -122,46 +159,40 @@ struct SubharmonicGenerator : Module {
 
 		oscillator1.freq = osc1Freq;
 		oscillator1.process(args.sampleTime);
+		oscillator1.sub1Selector = sub11Selector;
+		oscillator1.sub2Selector = sub12Selector;
 
 		oscillator2.freq = osc2Freq;
 		oscillator2.process(args.sampleTime);
-
-
-		sub11.freq = sub11Freq;
-		sub11.process(args.sampleTime);
-		sub12.freq = sub12Freq;
-		sub12.process(args.sampleTime);
-		sub21.freq = sub21Freq;
-		sub21.process(args.sampleTime);
-		sub22.freq = sub22Freq;
-		sub22.process(args.sampleTime);
+		oscillator2.sub1Selector = sub21Selector;
+		oscillator2.sub2Selector = sub22Selector;
 
 		if (waveform1 == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
-			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.sqr());
-			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.sqr());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Sqr());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Sqr());
 		} else if (waveform1 == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
-			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
-			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Saw());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Saw());
 		} else if (waveform1 == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
 			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.saw());
-			outputs[SUB11_OUTPUT].setVoltage(5.f * sub11.saw());
-			outputs[SUB12_OUTPUT].setVoltage(5.f * sub12.saw());
+			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Saw());
+			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Saw());
 		}
 
 		if (waveform2 == 2.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
-			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.sqr());
-			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.sqr());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Sqr());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Sqr());
 		} else if (waveform2 == 1.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
-			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
-			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Saw());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Saw());
 		} else if (waveform2 == 0.0f and outputs[OSC2_OUTPUT].isConnected()) {
 			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.saw());
-			outputs[SUB21_OUTPUT].setVoltage(5.f * sub21.saw());
-			outputs[SUB22_OUTPUT].setVoltage(5.f * sub22.saw());
+			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Saw());
+			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Saw());
 		}
 	}
 };
