@@ -159,29 +159,29 @@ struct SubharmonicGenerator : Module {
 		oscillator2.sub2Selector = sub22Selector;
 
 		if (waveform1 == 2.0f and outputs[OSC1_OUTPUT].isConnected()) {
-			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
+			outputs[OSC1_OUTPUT].setVoltage(5.f * (oscillator1.sqr() + oscillator1.sub1Sqr() + oscillator1.sub2Sqr()) / 3.0f);
 			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Sqr());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Sqr());
 		} else if (waveform1 == 1.0f and outputs[OSC1_OUTPUT].isConnected()) {
-			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.sqr());
+			outputs[OSC1_OUTPUT].setVoltage(5.f * (oscillator1.sqr() + oscillator1.sub1Saw() + oscillator1.sub2Saw()) / 3.0f);
 			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Saw());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Saw());
 		} else if (waveform1 == 0.0f and outputs[OSC1_OUTPUT].isConnected()) {
-			outputs[OSC1_OUTPUT].setVoltage(5.f * oscillator1.saw());
+			outputs[OSC1_OUTPUT].setVoltage(5.f * (oscillator1.saw() + oscillator1.sub1Saw() + oscillator1.sub2Saw()) / 3.0f);
 			outputs[SUB11_OUTPUT].setVoltage(5.f * oscillator1.sub1Saw());
 			outputs[SUB12_OUTPUT].setVoltage(5.f * oscillator1.sub2Saw());
 		}
 
 		if (waveform2 == 2.0f and outputs[OSC2_OUTPUT].isConnected()) {
-			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
+			outputs[OSC2_OUTPUT].setVoltage(5.f * (oscillator2.sqr() + oscillator2.sub1Sqr() + oscillator2.sub2Sqr()) / 3.f);
 			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Sqr());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Sqr());
 		} else if (waveform2 == 1.0f and outputs[OSC2_OUTPUT].isConnected()) {
-			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.sqr());
+			outputs[OSC2_OUTPUT].setVoltage(5.f * (oscillator2.sqr() + oscillator2.sub1Saw() + oscillator2.sub2Saw()) / 3.f);
 			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Saw());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Saw());
 		} else if (waveform2 == 0.0f and outputs[OSC2_OUTPUT].isConnected()) {
-			outputs[OSC2_OUTPUT].setVoltage(5.f * oscillator2.saw());
+			outputs[OSC2_OUTPUT].setVoltage(5.f * (oscillator2.saw() + oscillator2.sub1Saw() + oscillator2.sub2Saw()) / 3.f);
 			outputs[SUB21_OUTPUT].setVoltage(5.f * oscillator2.sub1Saw());
 			outputs[SUB22_OUTPUT].setVoltage(5.f * oscillator2.sub2Saw());
 		}
