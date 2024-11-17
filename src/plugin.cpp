@@ -9,7 +9,6 @@ void init(Plugin* p) {
 
 	// Add modules here
 	// p->addModel(modelMyModule);
-	p->addModel(modelRectifier);
 	p->addModel(modelSubharmonicGenerator);
 
 	// Any other plugin initialization may go here.
