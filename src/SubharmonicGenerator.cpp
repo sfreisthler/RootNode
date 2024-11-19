@@ -148,6 +148,13 @@ struct SubharmonicGenerator : Module {
 		float sub21Selector = std::floor(params[SUB21_PARAM].getValue());
 		float sub22Selector = std::floor(params[SUB22_PARAM].getValue());
 
+		float osc1Level = params[OSC1_LEVEL_PARAM].getValue();
+		float osc2Level = params[OSC2_LEVEL_PARAM].getValue();
+		float sub11Level = params[SUB11_LEVEL_PARAM].getValue();
+		float sub12Level = params[SUB12_LEVEL_PARAM].getValue();
+		float sub21Level = params[SUB21_LEVEL_PARAM].getValue();
+		float sub22Level = params[SUB22_LEVEL_PARAM].getValue();
+
 		// add cv input here
 
 		osc1Freq = clamp(osc1Freq, 0.f, args.sampleRate / 2.f);
@@ -164,19 +171,19 @@ struct SubharmonicGenerator : Module {
 		oscillator2.sub2Selector = sub22Selector;
 
 		if (waveform1 == 2.f) {
-			oscillator1.totalValue = (oscillator1.sqr() + oscillator1.sub1Sqr() + oscillator1.sub2Sqr()) / 3.f;
+			oscillator1.totalValue = (oscillator1.sqr() * osc1Level + oscillator1.sub1Sqr() * sub11Level + oscillator1.sub2Sqr() * sub12Level) / 3.f;
 		} else if (waveform1 == 1.f) {
-			oscillator1.totalValue = (oscillator1.sqr() + oscillator1.sub1Saw() + oscillator1.sub2Saw()) / 3.f;
+			oscillator1.totalValue = (oscillator1.sqr() * osc1Level + oscillator1.sub1Saw() * sub11Level + oscillator1.sub2Saw() * sub12Level) / 3.f;
 		} else if (waveform1 == 0.f) {
-			oscillator1.totalValue = (oscillator1.saw() + oscillator1.sub1Saw() + oscillator1.sub2Saw()) / 3.f;
+			oscillator1.totalValue = (oscillator1.saw() * osc1Level + oscillator1.sub1Saw() * sub11Level + oscillator1.sub2Saw() * sub12Level) / 3.f;
 		}
 
 		if (waveform2 == 2.f) {
-			oscillator2.totalValue = (oscillator2.sqr() + oscillator2.sub1Sqr() + oscillator2.sub2Sqr()) / 3.f;
+			oscillator2.totalValue = (oscillator2.sqr() * osc2Level + oscillator2.sub1Sqr() * sub21Level + oscillator2.sub2Sqr() * sub22Level) / 3.f;
 		} else if (waveform2 == 1.f) {
-			oscillator2.totalValue = (oscillator2.sqr() + oscillator2.sub1Saw() + oscillator2.sub2Saw()) / 3.f;
+			oscillator2.totalValue = (oscillator2.sqr() * osc2Level + oscillator2.sub1Saw() * sub21Level + oscillator2.sub2Saw() * sub22Level) / 3.f;
 		} else {
-			oscillator2.totalValue = (oscillator2.saw() + oscillator2.sub1Saw() + oscillator2.sub2Saw()) / 3.f;
+			oscillator2.totalValue = (oscillator2.saw() * osc2Level + oscillator2.sub1Saw() * sub21Level + oscillator2.sub2Saw() * sub22Level) / 3.f;
 		}
 
 		if (outputs[MIXED_OUTPUT].isConnected()) {
