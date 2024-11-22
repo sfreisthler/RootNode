@@ -86,18 +86,10 @@ struct VoltageControlledOscillator {
 
 struct SubharmonicGenerator : Module {
 	enum ParamId {
-		FREQ1_PARAM,
-		FREQ2_PARAM,
-		SUB11_PARAM,
-		SUB12_PARAM,
-		SUB21_PARAM,
-		SUB22_PARAM,
-		OSC1_LEVEL_PARAM,
-		OSC2_LEVEL_PARAM,
-		SUB11_LEVEL_PARAM,
-		SUB12_LEVEL_PARAM,
-		SUB21_LEVEL_PARAM,
-		SUB22_LEVEL_PARAM,
+		ENUMS(OSC_PARAM, 2),
+		ENUMS(OSC_MIX_PARAM,2),
+		ENUMS(SUB_PARAM, 4),
+		ENUMS(SUB_MIX_PARAM,4),
 		WAVEFORM1_PARAM,
 		WAVEFORM2_PARAM,
 		PARAMS_LEN
@@ -116,20 +108,26 @@ struct SubharmonicGenerator : Module {
 	VoltageControlledOscillator oscillator1;
 	VoltageControlledOscillator oscillator2;
 
+	float subLevels[4] = {0.f,0.f,0.f,0.f};
+	int subVals[4] = {1,1,1,1};
+	float oscLevels[2] = {0.f,0.f};
+	float oscVals[2] = {0.f,0.f};
+
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
-		configParam(FREQ1_PARAM, 262.f, 4186.f, 0.f, "");
-		configParam(FREQ2_PARAM, 262.f, 4186.f, 0.f, "");
-		configParam(SUB11_PARAM, 1.f, 16.f, 1.f, "");
-		configParam(SUB21_PARAM, 1.f, 16.f, 1.f, "");
-		configParam(SUB12_PARAM, 1.f, 16.f, 1.f, "");
-		configParam(SUB22_PARAM, 1.f, 16.f, 1.f, "");
-		configParam(OSC1_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(OSC2_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(SUB11_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(SUB12_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(SUB21_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
-		configParam(SUB22_LEVEL_PARAM, 0.f, 1.f, 0.f, "");
+
+		for (int i = 0; i < 4; i++) {
+			if (i < 2) {
+				configParam(OSC_MIX_PARAM + i, 0.f, 1.f, 0.f, "");
+				configParam(OSC_PARAM + i, 262.f, 4186.f, 0.f, "");
+				configParam(SUB_PARAM + i, 1.f, 16.f, 1.f, "");
+				configParam(SUB_MIX_PARAM + i, 0.f, 1.f, 0.f, "");
+			} else {
+				configParam(SUB_PARAM + i, 1.f, 16.f, 1.f, "");
+				configParam(SUB_MIX_PARAM + i, 0.f, 1.f, 0.f, "");
+			}
+		}
+
 		configOutput(MIXED_OUTPUT, "");
 
 		configSwitch(WAVEFORM1_PARAM, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
@@ -140,50 +138,48 @@ struct SubharmonicGenerator : Module {
 		float waveform1 = params[WAVEFORM1_PARAM].getValue();
 		float waveform2 = params[WAVEFORM2_PARAM].getValue();
 
-		float osc1Freq = params[FREQ1_PARAM].getValue();
-		float sub11Selector = std::floor(params[SUB11_PARAM].getValue());
-		float sub12Selector = std::floor(params[SUB12_PARAM].getValue());
+		for (int i = 0; i < 4; i++) {
+			if (i < 2) {
+				subLevels[i] = params[SUB_MIX_PARAM + i].getValue();
+				subVals[i] = std::floor(params[SUB_PARAM + i].getValue());
+				oscVals[i] = params[OSC_PARAM + i].getValue();
+				oscLevels[i] = params[OSC_MIX_PARAM + i].getValue();
+			} else {
+				subLevels[i] = params[SUB_MIX_PARAM + i].getValue();
+				subVals[i] = std::floor(params[SUB_PARAM + i].getValue());
+			}
+		}
 
-		float osc2Freq = params[FREQ2_PARAM].getValue();
-		float sub21Selector = std::floor(params[SUB21_PARAM].getValue());
-		float sub22Selector = std::floor(params[SUB22_PARAM].getValue());
-
-		float osc1Level = params[OSC1_LEVEL_PARAM].getValue();
-		float osc2Level = params[OSC2_LEVEL_PARAM].getValue();
-		float sub11Level = params[SUB11_LEVEL_PARAM].getValue();
-		float sub12Level = params[SUB12_LEVEL_PARAM].getValue();
-		float sub21Level = params[SUB21_LEVEL_PARAM].getValue();
-		float sub22Level = params[SUB22_LEVEL_PARAM].getValue();
+		for (int i = 0; i < 2; i++) {
+			oscVals[i] = clamp(oscVals[i], 0.f, args.sampleRate / 2.f);
+		}
 
 		// add cv input here
 
-		osc1Freq = clamp(osc1Freq, 0.f, args.sampleRate / 2.f);
-		osc2Freq = clamp(osc2Freq, 0.f, args.sampleRate / 2.f);
-
-		oscillator1.freq = osc1Freq;
+		oscillator1.freq = oscVals[0];
 		oscillator1.process(args.sampleTime);
-		oscillator1.sub1Selector = sub11Selector;
-		oscillator1.sub2Selector = sub12Selector;
+		oscillator1.sub1Selector = subVals[0];
+		oscillator1.sub2Selector = subVals[1];
 
-		oscillator2.freq = osc2Freq;
+		oscillator2.freq = oscVals[1];
 		oscillator2.process(args.sampleTime);
-		oscillator2.sub1Selector = sub21Selector;
-		oscillator2.sub2Selector = sub22Selector;
+		oscillator2.sub1Selector = subVals[2];
+		oscillator2.sub2Selector = subVals[3];
 
 		if (waveform1 == 2.f) {
-			oscillator1.totalValue = (oscillator1.sqr() * osc1Level + oscillator1.sub1Sqr() * sub11Level + oscillator1.sub2Sqr() * sub12Level) / 3.f;
+			oscillator1.totalValue = (oscillator1.sqr() * oscLevels[0] + oscillator1.sub1Sqr() * subLevels[0] + oscillator1.sub2Sqr() * subLevels[1]) / 3.f;
 		} else if (waveform1 == 1.f) {
-			oscillator1.totalValue = (oscillator1.sqr() * osc1Level + oscillator1.sub1Saw() * sub11Level + oscillator1.sub2Saw() * sub12Level) / 3.f;
+			oscillator1.totalValue = (oscillator1.sqr() * oscLevels[0] + oscillator1.sub1Saw() * subLevels[0] + oscillator1.sub2Saw() * subLevels[1]) / 3.f;
 		} else if (waveform1 == 0.f) {
-			oscillator1.totalValue = (oscillator1.saw() * osc1Level + oscillator1.sub1Saw() * sub11Level + oscillator1.sub2Saw() * sub12Level) / 3.f;
+			oscillator1.totalValue = (oscillator1.saw() * oscLevels[0] + oscillator1.sub1Saw() * subLevels[0] + oscillator1.sub2Saw() * subLevels[1]) / 3.f;
 		}
 
 		if (waveform2 == 2.f) {
-			oscillator2.totalValue = (oscillator2.sqr() * osc2Level + oscillator2.sub1Sqr() * sub21Level + oscillator2.sub2Sqr() * sub22Level) / 3.f;
+			oscillator2.totalValue = (oscillator2.sqr() * oscLevels[1] + oscillator2.sub1Sqr() * subLevels[2] + oscillator2.sub2Sqr() * subLevels[3]) / 3.f;
 		} else if (waveform2 == 1.f) {
-			oscillator2.totalValue = (oscillator2.sqr() * osc2Level + oscillator2.sub1Saw() * sub21Level + oscillator2.sub2Saw() * sub22Level) / 3.f;
+			oscillator2.totalValue = (oscillator2.sqr() * oscLevels[1] + oscillator2.sub1Saw() * subLevels[2] + oscillator2.sub2Saw() * subLevels[3]) / 3.f;
 		} else {
-			oscillator2.totalValue = (oscillator2.saw() * osc2Level + oscillator2.sub1Saw() * sub21Level + oscillator2.sub2Saw() * sub22Level) / 3.f;
+			oscillator2.totalValue = (oscillator2.saw() * oscLevels[1] + oscillator2.sub1Saw() * subLevels[2] + oscillator2.sub2Saw() * subLevels[3]) / 3.f;
 		}
 
 		if (outputs[MIXED_OUTPUT].isConnected()) {
@@ -203,18 +199,18 @@ struct SubharmonicGeneratorWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.919, 14.137)), module, SubharmonicGenerator::FREQ1_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.831, 14.137)), module, SubharmonicGenerator::FREQ2_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.82, 35.164)), module, SubharmonicGenerator::SUB11_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(44.678, 35.164)), module, SubharmonicGenerator::SUB12_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(76.902, 35.164)), module, SubharmonicGenerator::SUB21_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(104.76, 35.164)), module, SubharmonicGenerator::SUB22_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.089, 67.535)), module, SubharmonicGenerator::OSC1_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(91.001, 67.535)), module, SubharmonicGenerator::OSC2_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.99, 88.562)), module, SubharmonicGenerator::SUB11_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(44.848, 88.562)), module, SubharmonicGenerator::SUB12_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(77.072, 88.562)), module, SubharmonicGenerator::SUB21_LEVEL_PARAM));
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(104.93, 88.562)), module, SubharmonicGenerator::SUB22_LEVEL_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(30.919, 14.137)), module, SubharmonicGenerator::OSC_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(90.831, 14.137)), module, SubharmonicGenerator::OSC_PARAM + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.82, 35.164)), module, SubharmonicGenerator::SUB_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(44.678, 35.164)), module, SubharmonicGenerator::SUB_PARAM + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(76.902, 35.164)), module, SubharmonicGenerator::SUB_PARAM + 2));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(104.76, 35.164)), module, SubharmonicGenerator::SUB_PARAM + 3));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(31.089, 67.535)), module, SubharmonicGenerator::OSC_MIX_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(91.001, 67.535)), module, SubharmonicGenerator::OSC_MIX_PARAM + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(16.99, 88.562)), module, SubharmonicGenerator::SUB_MIX_PARAM));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(44.848, 88.562)), module, SubharmonicGenerator::SUB_MIX_PARAM + 1));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(77.072, 88.562)), module, SubharmonicGenerator::SUB_MIX_PARAM + 2));
+		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(104.93, 88.562)), module, SubharmonicGenerator::SUB_MIX_PARAM + 3));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(16.99, 115.284)), module, SubharmonicGenerator::MIXED_OUTPUT));
 
