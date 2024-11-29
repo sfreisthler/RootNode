@@ -11,18 +11,16 @@ class WaveformConverter {
 		GateProcessor gate;
 
 	public:
-		float toSaw(float value, float freq, float sampleRate) {
+		float toSaw(float value, float freq, float sampleTime) {
 			gate.set(value);
 
 
 			if (gate.trailingEdge()) {
-				//DEBUG("DEBUG: TRAILING EDGE");
 				phase = 0.f;
 			}
 
 			// accumulate phase
-			//DEBUG("DEBUG: Freq %f, Sample: %f", freq, sampleRate);
-			phase += freq * sampleRate;
+			phase += freq * sampleTime;
 
 			if (phase >= 1.0f)
             	phase -= 1.0f;
