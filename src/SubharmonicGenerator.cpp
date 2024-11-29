@@ -139,13 +139,26 @@ struct SubharmonicGenerator : Module {
 		}
 
 		// Set outputs based on osc2 switch
+		float osc2 = oscillators[1].sqr();
+		float sub21 = boolToAudio(dividers[2].process(osc2));
+		float sub22 = boolToAudio(dividers[3].process(osc2));
 		switch ((int) params[WAVEFORM_PARAM + 1].getValue()) {
 			case 0:
 				outputs[VCO2_OUTPUT].setVoltage(converters[3].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime));
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime));
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime));
 				break;
-			default:
+			case 1:
 				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime));
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime));
 				break;
+			case 2:
+				outputs[VCO2_OUTPUT].setVoltage(osc2);
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(sub21);
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(sub22);
+				break;
+
 		}
 	}
 };
