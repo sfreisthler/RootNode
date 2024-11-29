@@ -122,19 +122,19 @@ struct SubharmonicGenerator : Module {
 		float sub12 = boolToAudio(dividers[1].process(osc1));
 		switch ((int) params[WAVEFORM_PARAM].getValue()) {
 			case 0:
-				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(osc1, oscillators[0].freq, args.sampleTime));
-				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime));
-				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime));
+				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(osc1, oscillators[0].freq, args.sampleTime) * params[OSC_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime) * params[SUB_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 1].getValue());
 				break;
 			case 1:
-				outputs[VCO1_OUTPUT].setVoltage(osc1);
-				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime));
-				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime));
+				outputs[VCO1_OUTPUT].setVoltage(osc1 * params[OSC_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime) * params[SUB_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 1].getValue());
 				break;
 			case 2:
-				outputs[VCO1_OUTPUT].setVoltage(osc1);
-				outputs[VCO1_SUB1_OUTPUT].setVoltage(sub11);
-				outputs[VCO1_SUB2_OUTPUT].setVoltage(sub12);
+				outputs[VCO1_OUTPUT].setVoltage(osc1 * params[OSC_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(sub11 * params[SUB_LEVEL_PARAM].getValue());
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(sub12 * params[SUB_LEVEL_PARAM + 1].getValue());
 				break;
 		}
 
@@ -144,19 +144,19 @@ struct SubharmonicGenerator : Module {
 		float sub22 = boolToAudio(dividers[3].process(osc2));
 		switch ((int) params[WAVEFORM_PARAM + 1].getValue()) {
 			case 0:
-				outputs[VCO2_OUTPUT].setVoltage(converters[3].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime));
-				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime));
-				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime));
+				outputs[VCO2_OUTPUT].setVoltage(converters[3].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime) * params[OSC_LEVEL_PARAM + 1].getValue());
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 2].getValue());
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 3].getValue());
 				break;
 			case 1:
-				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
-				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime));
-				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime));
+				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr() * params[OSC_LEVEL_PARAM + 1].getValue());
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(converters[4].toSaw(sub21, oscillators[1].freq / dividers[2].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 2].getValue());
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(converters[5].toSaw(sub22, oscillators[1].freq / dividers[3].N, args.sampleTime) * params[SUB_LEVEL_PARAM + 3].getValue());
 				break;
 			case 2:
-				outputs[VCO2_OUTPUT].setVoltage(osc2);
-				outputs[VCO2_SUB1_OUTPUT].setVoltage(sub21);
-				outputs[VCO2_SUB2_OUTPUT].setVoltage(sub22);
+				outputs[VCO2_OUTPUT].setVoltage(osc2 * params[OSC_LEVEL_PARAM + 1].getValue());
+				outputs[VCO2_SUB1_OUTPUT].setVoltage(sub21 * params[SUB_LEVEL_PARAM + 2].getValue());
+				outputs[VCO2_SUB2_OUTPUT].setVoltage(sub22 * params[SUB_LEVEL_PARAM + 3].getValue());
 				break;
 
 		}
