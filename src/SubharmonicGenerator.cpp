@@ -1,5 +1,9 @@
 #include "plugin.hpp"
+#include <cmath>
 #include "inc/WaveformConverter.hpp"
+#include "inc/FrequencyDivider.hpp"
+#include "inc/Utility.hpp"
+#include "inc/GateProcessor.hpp"
 
 struct SquareWaveGenerator {
     float phase = 0.f;
@@ -66,7 +70,8 @@ struct SubharmonicGenerator : Module {
 	};
 
 	SquareWaveGenerator oscillators[2];
-	WaveformConverter converters[2];
+	WaveformConverter converters[6];
+	FrequencyDivider dividers[4];
 
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -101,26 +106,42 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		for (int i = 0; i < 2; i++) {
-			oscillators[i].freq = params[OSC_PARAM + i].getValue();
-			oscillators[i].process(args.sampleTime);
+		for (int i = 0; i < 4; i++) {
+			dividers[i].setN(std::floor(params[SUB_PARAM + i].getValue()));
+			dividers[i].setMaxN(16);
+
+			if (i < 2) {
+				oscillators[i].freq = params[OSC_PARAM + i].getValue();
+				oscillators[i].process(args.sampleTime);
+			}
 		}
 
 		// Set outputs based on osc1 switch
+		float osc1 = oscillators[0].sqr();
+		float sub11 = boolToAudio(dividers[0].process(osc1));
+		float sub12 = boolToAudio(dividers[1].process(osc1));
 		switch ((int) params[WAVEFORM_PARAM].getValue()) {
 			case 0:
-				//outputs[VCO1_OUTPUT].setVoltage(oscillators[0].saw());
-				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(oscillators[0].sqr(), oscillators[0].freq, args.sampleTime));
+				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(osc1, oscillators[0].freq, args.sampleTime));
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime));
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime));
 				break;
-			default:
-				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].sqr());
+			case 1:
+				outputs[VCO1_OUTPUT].setVoltage(osc1);
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(converters[1].toSaw(sub11, oscillators[0].freq / dividers[0].N, args.sampleTime));
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(converters[2].toSaw(sub12, oscillators[0].freq / dividers[1].N, args.sampleTime));
+				break;
+			case 2:
+				outputs[VCO1_OUTPUT].setVoltage(osc1);
+				outputs[VCO1_SUB1_OUTPUT].setVoltage(sub11);
+				outputs[VCO1_SUB2_OUTPUT].setVoltage(sub12);
 				break;
 		}
 
 		// Set outputs based on osc2 switch
 		switch ((int) params[WAVEFORM_PARAM + 1].getValue()) {
 			case 0:
-				outputs[VCO2_OUTPUT].setVoltage(converters[1].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime));
+				outputs[VCO2_OUTPUT].setVoltage(converters[3].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime));
 				break;
 			default:
 				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
