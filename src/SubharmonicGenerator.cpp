@@ -1,6 +1,7 @@
 #include "plugin.hpp"
+#include "inc/WaveformConverter.hpp"
 
-struct VoltageControlledOscillator {
+struct SquareWaveGenerator {
     float phase = 0.f;
     float freq = 0.f;
 
@@ -28,10 +29,6 @@ struct VoltageControlledOscillator {
         sawValue = 10.f * phase - 5.f;
         sawValue += sawMinBlep.process();
 			
-    }
-
-    float saw() {
-        return sawValue;
     }
 
     float sqr() {
@@ -74,7 +71,8 @@ struct SubharmonicGenerator : Module {
 		LIGHTS_LEN
 	};
 
-	VoltageControlledOscillator oscillators[2];
+	SquareWaveGenerator oscillators[2];
+	WaveformConverter converters[2];
 
 	SubharmonicGenerator() {
 		config(PARAMS_LEN, INPUTS_LEN, OUTPUTS_LEN, LIGHTS_LEN);
@@ -117,26 +115,20 @@ struct SubharmonicGenerator : Module {
 		// Set outputs based on osc1 switch
 		switch ((int) params[WAVEFORM_PARAM].getValue()) {
 			case 0:
-				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].saw());
+				//outputs[VCO1_OUTPUT].setVoltage(oscillators[0].saw());
+				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(oscillators[0].sqr(), oscillators[0].freq, args.sampleTime));
 				break;
-			case 1:
-				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].sqr());
-				break;
-			case 2:
+			default:
 				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].sqr());
 				break;
 		}
 
-		// set outputs based on osc2 switch
-
+		// Set outputs based on osc2 switch
 		switch ((int) params[WAVEFORM_PARAM + 1].getValue()) {
 			case 0:
-				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].saw());
+				outputs[VCO2_OUTPUT].setVoltage(converters[1].toSaw(oscillators[1].sqr(), oscillators[1].freq, args.sampleTime));
 				break;
-			case 1:
-				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
-				break;
-			case 2:
+			default:
 				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
 				break;
 		}
