@@ -109,6 +109,37 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		for (int i = 0; i < 2; i++) {
+			oscillators[i].freq = params[OSC_PARAM + i].getValue();
+			oscillators[i].process(args.sampleTime);
+		}
+
+		// Set outputs based on osc1 switch
+		switch ((int) params[WAVEFORM_PARAM].getValue()) {
+			case 0:
+				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].saw());
+				break;
+			case 1:
+				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].sqr());
+				break;
+			case 2:
+				outputs[VCO1_OUTPUT].setVoltage(oscillators[0].sqr());
+				break;
+		}
+
+		// set outputs based on osc2 switch
+
+		switch ((int) params[WAVEFORM_PARAM + 1].getValue()) {
+			case 0:
+				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].saw());
+				break;
+			case 1:
+				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
+				break;
+			case 2:
+				outputs[VCO2_OUTPUT].setVoltage(oscillators[1].sqr());
+				break;
+		}
 	}
 };
 
