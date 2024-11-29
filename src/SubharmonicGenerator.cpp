@@ -8,6 +8,7 @@
 struct SquareWaveGenerator {
     float phase = 0.f;
     float freq = 0.f;
+	float dutyCycle = 0.5f;
 
     dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
 
@@ -25,7 +26,7 @@ struct SquareWaveGenerator {
             phase -= 1.0f;
 
         // Calculate square wave (±5) based on phase
-        sqrValue = phase < 0.5f ? 5.f : -5.f;
+        sqrValue = phase < dutyCycle ? 5.f : -5.f;
         sqrValue += sqrMinBlep.process();
     }
 
@@ -107,8 +108,20 @@ struct SubharmonicGenerator : Module {
 
 	void process(const ProcessArgs& args) override {
 		float vco1_cv = pow(2.f, inputs[VCO1_INPUT].getVoltage() - 5.f);
+		float vco2_cv = pow(2.f, inputs[VCO2_INPUT].getVoltage() - 5.f);
 		int vco1_sub_cv = std::floor(rescale(inputs[VCO1_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
 		int vco2_sub_cv = std::floor(rescale(inputs[VCO2_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
+		float vco1_pwm = rescale(inputs[VCO1_PWM_INPUT].getVoltage() - 5.f, -5, 5, 0.01, 0.99);
+		float vco2_pwm = rescale(inputs[VCO2_PWM_INPUT].getVoltage() - 5.f, -5, 5, 0.01, 0.99);
+
+		oscillators[0].dutyCycle = 0.5f;
+		oscillators[1].dutyCycle = 0.5f;
+
+		if (inputs[VCO1_PWM_INPUT].isConnected()) 
+			oscillators[0].dutyCycle = vco1_pwm;
+
+		if (inputs[VCO2_PWM_INPUT].isConnected()) 
+			oscillators[1].dutyCycle = vco2_pwm;
 
 
 		for (int i = 0; i < 4; i++) {
@@ -121,6 +134,9 @@ struct SubharmonicGenerator : Module {
 				} else {
 					oscillators[i].freq = params[OSC_PARAM + i].getValue();
 				}
+
+				if (inputs[VCO2_INPUT].isConnected() and i == 1)
+					oscillators[i].freq = params[OSC_PARAM + i].getValue() * vco2_cv;
 		
 				oscillators[i].process(args.sampleTime);
 			}
