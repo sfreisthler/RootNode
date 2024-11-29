@@ -5,7 +5,6 @@ struct SquareWaveGenerator {
     float phase = 0.f;
     float freq = 0.f;
 
-    dsp::MinBlepGenerator<16, 16, float> sawMinBlep;
     dsp::MinBlepGenerator<16, 16, float> sqrMinBlep;
 
     float sawValue = 0.f;
@@ -24,11 +23,6 @@ struct SquareWaveGenerator {
         // Calculate square wave (±5) based on phase
         sqrValue = phase < 0.5f ? 5.f : -5.f;
         sqrValue += sqrMinBlep.process();
-
-        // Calculate sawtooth wave (linear ramp from -5 to 5)
-        sawValue = 10.f * phase - 5.f;
-        sawValue += sawMinBlep.process();
-			
     }
 
     float sqr() {
