@@ -120,6 +120,7 @@ struct SubharmonicGenerator : Module {
 		float osc1 = oscillators[0].sqr();
 		float sub11 = boolToAudio(dividers[0].process(osc1));
 		float sub12 = boolToAudio(dividers[1].process(osc1));
+		float out = 0.f;
 		switch ((int) params[WAVEFORM_PARAM].getValue()) {
 			case 0:
 				outputs[VCO1_OUTPUT].setVoltage(converters[0].toSaw(osc1, oscillators[0].freq, args.sampleTime) * params[OSC_LEVEL_PARAM].getValue());
@@ -160,6 +161,15 @@ struct SubharmonicGenerator : Module {
 				break;
 
 		}
+
+		out += outputs[VCO1_OUTPUT].getVoltage();
+		out += outputs[VCO2_OUTPUT].getVoltage();
+		out += outputs[VCO1_SUB1_OUTPUT].getVoltage();
+		out += outputs[VCO1_SUB2_OUTPUT].getVoltage();
+		out += outputs[VCO2_SUB1_OUTPUT].getVoltage();
+		out += outputs[VCO2_SUB2_OUTPUT].getVoltage();
+
+		outputs[VCA_OUTPUT].setVoltage(clamp(out, -11.2f, 11.2f));
 	}
 };
 
