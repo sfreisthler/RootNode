@@ -106,14 +106,34 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		float vco1_cv = pow(2.f, inputs[VCO1_INPUT].getVoltage() - 5.f);
+		int vco1_sub_cv = std::floor(rescale(inputs[VCO1_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
+		int vco2_sub_cv = std::floor(rescale(inputs[VCO2_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
+
+
 		for (int i = 0; i < 4; i++) {
 			dividers[i].setN(std::floor(params[SUB_PARAM + i].getValue()));
 			dividers[i].setMaxN(16);
 
 			if (i < 2) {
-				oscillators[i].freq = params[OSC_PARAM + i].getValue();
+				if (inputs[VCO1_INPUT].isConnected()) {
+					oscillators[i].freq = params[OSC_PARAM + i].getValue() * vco1_cv;
+				} else {
+					oscillators[i].freq = params[OSC_PARAM + i].getValue();
+				}
+		
 				oscillators[i].process(args.sampleTime);
 			}
+		}
+
+		if (inputs[VCO1_SUB_INPUT].isConnected()) {
+			dividers[0].setN(vco1_sub_cv);
+			dividers[1].setN(vco1_sub_cv);
+		}
+
+		if (inputs[VCO2_SUB_INPUT].isConnected()) {
+			dividers[2].setN(vco2_sub_cv);
+			dividers[3].setN(vco2_sub_cv);
 		}
 
 		// Set outputs based on osc1 switch
