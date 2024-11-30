@@ -107,12 +107,12 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		float vco1_cv = pow(2.f, inputs[VCO1_INPUT].getVoltage() - 5.f);
-		float vco2_cv = pow(2.f, inputs[VCO2_INPUT].getVoltage() - 5.f);
-		int vco1_sub_cv = std::floor(rescale(inputs[VCO1_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
-		int vco2_sub_cv = std::floor(rescale(inputs[VCO2_SUB_INPUT].getVoltage() - 5.f, -5, 5, 0.f, 16.f));
-		float vco1_pwm = rescale(inputs[VCO1_PWM_INPUT].getVoltage() - 5.f, -5, 5, 0.01, 0.99);
-		float vco2_pwm = rescale(inputs[VCO2_PWM_INPUT].getVoltage() - 5.f, -5, 5, 0.01, 0.99);
+		float vco1_cv = pow(2.f, inputs[VCO1_INPUT].getVoltage());
+		float vco2_cv = pow(2.f, inputs[VCO2_INPUT].getVoltage());
+		int vco1_sub_cv = std::floor(rescale(inputs[VCO1_SUB_INPUT].getVoltage(), -5, 5, 0.f, 16.f));
+		int vco2_sub_cv = std::floor(rescale(inputs[VCO2_SUB_INPUT].getVoltage(), -5, 5, 0.f, 16.f));
+		float vco1_pwm = rescale(inputs[VCO1_PWM_INPUT].getVoltage(), -5, 5, 0.01, 0.99);
+		float vco2_pwm = rescale(inputs[VCO2_PWM_INPUT].getVoltage(), -5, 5, 0.01, 0.99);
 
 		oscillators[0].dutyCycle = 0.5f;
 		oscillators[1].dutyCycle = 0.5f;
