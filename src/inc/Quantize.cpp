@@ -62,3 +62,31 @@ double quantize12JI(double frequency) {
     // Calculate the frequency in just intonation
     return C4_FREQUENCY * closestRatio * octaveFactor;
 }
+
+double quantize8JI(double frequency) {
+	float ratios[8] = { 1.f / 1.f, 9.f / 8.f, 5.f / 4.f, 4.f / 3.f,
+							3.f / 2.f, 5.f / 3.f, 15.f / 8.f,
+							2.f / 1.f};
+	double relativeFrequency = frequency / C4_FREQUENCY;
+	double octaveFactor = 1.f;
+
+    while (relativeFrequency >= 2.0) {
+        relativeFrequency /= 2.0;
+		octaveFactor *= 2.f;
+    }
+
+    // Find the closest ratio
+    double minError = std::numeric_limits<double>::max();
+    double closestRatio = 0.0;
+    std::string closestDegree;
+    for (size_t i = 0; i < sizeof(ratios); ++i) {
+        double error = std::abs(relativeFrequency - ratios[i]);
+        if (error < minError) {
+            minError = error;
+            closestRatio = ratios[i];
+        }
+    }
+
+    // Calculate the frequency in just intonation
+    return C4_FREQUENCY * closestRatio * octaveFactor;
+}
