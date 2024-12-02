@@ -269,7 +269,7 @@ struct SubharmonicGeneratorWidget : ModuleWidget {
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(11.026, 28.285)), module, SubharmonicGenerator::WAVEFORM_PARAM));
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(93.183, 28.285)), module, SubharmonicGenerator::WAVEFORM_PARAM + 1));
 
-		addParam(createParamCentered<StarPushButton5>(mm2px(Vec(52.1, 80.901)), module, SubharmonicGenerator::QUANTIZE_PARAM));
+		addParam(createParamCentered<PushButton5>(mm2px(Vec(52.1, 85)), module, SubharmonicGenerator::QUANTIZE_PARAM));
 	}
 };
 

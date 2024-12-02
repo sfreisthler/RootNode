@@ -2,14 +2,14 @@
 
 using namespace rack;
 
-struct StarPushButton5 : SvgSwitch {
-    StarPushButton5() {
+struct PushButton5 : SvgSwitch {
+    PushButton5() {
         // Load SVG files for each state
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_1.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_2.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_3.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_4.svg")));
-        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_5.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_1.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_2.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_3.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_4.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_5.svg")));
 
         // Disable shadow for cleaner appearance
         shadow->opacity = 0.0f;
