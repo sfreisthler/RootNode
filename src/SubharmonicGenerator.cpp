@@ -148,13 +148,13 @@ struct SubharmonicGenerator : Module {
 
 			if (i < 2) {
 				if (inputs[VCO1_INPUT].isConnected()) {
-				oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue(), (int) params[QUANTIZE_PARAM].getValue()) * vco1_cv;
-				} else {
+					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue() * vco1_cv,(int) params[QUANTIZE_PARAM].getValue());
+				} else if (inputs[VCO2_INPUT].isConnected() and i == 1) {
+					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue() * vco2_cv,(int) params[QUANTIZE_PARAM].getValue());
+				}
+				else {
 					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue(), (int) params[QUANTIZE_PARAM].getValue());
 				}
-
-				if (inputs[VCO2_INPUT].isConnected() and i == 1)
-					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue() * vco2_cv, 1);
 		
 				oscillators[i].process(args.sampleTime);
 			}
