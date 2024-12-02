@@ -4,6 +4,7 @@
 #include "inc/FrequencyDivider.hpp"
 #include "inc/Utility.hpp"
 #include "inc/GateProcessor.hpp"
+#include "inc/Quantize.cpp"
 
 struct SquareWaveGenerator {
     float phase = 0.f;
@@ -44,6 +45,7 @@ struct SubharmonicGenerator : Module {
 		ENUMS(OSC_LEVEL_PARAM, 2),
 		ENUMS(SUB_LEVEL_PARAM, 4),
 		ENUMS(WAVEFORM_PARAM, 2),
+		QUANTIZE_PARAM,
 		PARAMS_LEN
 	};
 	enum InputId {
@@ -53,14 +55,13 @@ struct SubharmonicGenerator : Module {
 		VCO2_INPUT,
 		VCO2_SUB_INPUT,
 		VCO2_PWM_INPUT,
-		VCA_INPUT,
 		INPUTS_LEN
 	};
 	enum OutputId {
 		VCO1_OUTPUT,
 		VCO1_SUB1_OUTPUT,
 		VCO1_SUB2_OUTPUT,
-		VCA_OUTPUT,
+		TOTAL_OUTPUT,
 		VCO2_OUTPUT,
 		VCO2_SUB1_OUTPUT,
 		VCO2_SUB2_OUTPUT,
@@ -84,14 +85,14 @@ struct SubharmonicGenerator : Module {
 		configInput(VCO2_INPUT, "");
 		configInput(VCO2_SUB_INPUT, "");
 		configInput(VCO2_PWM_INPUT, "");
-		configInput(VCA_INPUT, "");
 		configOutput(VCO1_OUTPUT, "");
 		configOutput(VCO1_SUB1_OUTPUT, "");
 		configOutput(VCO1_SUB2_OUTPUT, "");
-		configOutput(VCA_OUTPUT, "");
+		configOutput(TOTAL_OUTPUT, "");
 		configOutput(VCO2_OUTPUT, "");
 		configOutput(VCO2_SUB1_OUTPUT, "");
 		configOutput(VCO2_SUB2_OUTPUT, "");
+		configParam(QUANTIZE_PARAM, 0.0f, 4.0f, 0.0f, "Quantize Param");
 
 		// configure oscillator and mixer parameters
 		for (int i = 0; i < 4; i++) {
@@ -100,9 +101,27 @@ struct SubharmonicGenerator : Module {
 
 			if (i < 2) {
 				configParam(OSC_LEVEL_PARAM + i, 0.f, 1.f, 0.f, "");
-				configParam(OSC_PARAM + i, 262.f, 4186.f, 0.f, "");
+				configParam(OSC_PARAM + i, 261.63, 4186.01, 0.f, "");
 				configSwitch(WAVEFORM_PARAM + i, 0.f, 2.f, 0.f, "Waveform", {"Saw", "Square<-Saw", "Square"});
 			}
+		}
+	}
+
+	float quantize(float freq, int mode) {
+		switch (mode) {
+			case 0:
+				// no quantize mode, return same frequency
+				return freq;
+			case 1:
+				return quantize12ET(freq);
+			case 2:
+				return quantize8ET(freq);
+			case 3:
+				return quantize12JI(freq);
+			case 4:
+				return quantize8JI(freq);
+			default:
+				return freq;
 		}
 	}
 
@@ -132,11 +151,11 @@ struct SubharmonicGenerator : Module {
 				if (inputs[VCO1_INPUT].isConnected()) {
 					oscillators[i].freq = params[OSC_PARAM + i].getValue() * vco1_cv;
 				} else {
-					oscillators[i].freq = params[OSC_PARAM + i].getValue();
+					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue(), (int) params[QUANTIZE_PARAM].getValue());
 				}
 
 				if (inputs[VCO2_INPUT].isConnected() and i == 1)
-					oscillators[i].freq = params[OSC_PARAM + i].getValue() * vco2_cv;
+					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue() * vco2_cv, 1);
 		
 				oscillators[i].process(args.sampleTime);
 			}
@@ -205,7 +224,7 @@ struct SubharmonicGenerator : Module {
 		out += outputs[VCO2_SUB1_OUTPUT].getVoltage();
 		out += outputs[VCO2_SUB2_OUTPUT].getVoltage();
 
-		outputs[VCA_OUTPUT].setVoltage(clamp(out, -11.2f, 11.2f));
+		outputs[TOTAL_OUTPUT].setVoltage(clamp(out, -11.2f, 11.2f));
 	}
 };
 
@@ -239,18 +258,19 @@ struct SubharmonicGeneratorWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(113.522, 80.901)), module, SubharmonicGenerator::VCO2_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(131.478, 80.901)), module, SubharmonicGenerator::VCO2_SUB_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(149.434, 80.901)), module, SubharmonicGenerator::VCO2_PWM_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(167.391, 80.901)), module, SubharmonicGenerator::VCA_INPUT));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(113.522, 54.593)), module, SubharmonicGenerator::VCO1_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(131.478, 54.593)), module, SubharmonicGenerator::VCO1_SUB1_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(149.434, 54.593)), module, SubharmonicGenerator::VCO1_SUB2_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(167.391, 54.593)), module, SubharmonicGenerator::VCA_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(167.391, 54.593)), module, SubharmonicGenerator::TOTAL_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(113.522, 107.209)), module, SubharmonicGenerator::VCO2_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(131.478, 107.209)), module, SubharmonicGenerator::VCO2_SUB1_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(149.434, 107.209)), module, SubharmonicGenerator::VCO2_SUB2_OUTPUT));
 
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(11.026, 28.285)), module, SubharmonicGenerator::WAVEFORM_PARAM));
 		addParam(createParamCentered<CKSSThree>(mm2px(Vec(93.183, 28.285)), module, SubharmonicGenerator::WAVEFORM_PARAM + 1));
+
+		addParam(createParamCentered<StarPushButton5>(mm2px(Vec(52.1, 80.901)), module, SubharmonicGenerator::QUANTIZE_PARAM));
 	}
 };
 

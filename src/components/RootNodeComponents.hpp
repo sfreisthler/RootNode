@@ -1,0 +1,28 @@
+#include "componentlibrary.hpp"
+
+using namespace rack;
+
+struct StarPushButton5 : SvgSwitch {
+    StarPushButton5() {
+        // Load SVG files for each state
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_1.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_2.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_3.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_4.svg")));
+        addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/StarButton_5.svg")));
+
+        // Disable shadow for cleaner appearance
+        shadow->opacity = 0.0f;
+    }
+
+    // Handle state cycling
+     void onButton(const event::Button& e) override {
+        if (e.action == GLFW_PRESS) {  // Only handle button press events
+            // Cycle through the 5 states
+            float currentValue = getParamQuantity()->getValue();
+            int nextState = ((int)currentValue + 1) % 5; // Increment state and wrap back to 0
+            getParamQuantity()->setValue((float)nextState); // Update state
+        }
+        SvgSwitch::onButton(e); // Call parent class behavior
+    }
+};
