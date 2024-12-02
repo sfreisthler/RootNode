@@ -23,6 +23,5 @@ struct StarPushButton5 : SvgSwitch {
             int nextState = ((int)currentValue + 1) % 5; // Increment state and wrap back to 0
             getParamQuantity()->setValue((float)nextState); // Update state
         }
-        SvgSwitch::onButton(e); // Call parent class behavior
     }
 };

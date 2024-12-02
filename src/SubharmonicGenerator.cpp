@@ -110,7 +110,6 @@ struct SubharmonicGenerator : Module {
 	float quantize(float freq, int mode) {
 		switch (mode) {
 			case 0:
-				// no quantize mode, return same frequency
 				return freq;
 			case 1:
 				return quantize12ET(freq);
@@ -149,7 +148,7 @@ struct SubharmonicGenerator : Module {
 
 			if (i < 2) {
 				if (inputs[VCO1_INPUT].isConnected()) {
-					oscillators[i].freq = params[OSC_PARAM + i].getValue() * vco1_cv;
+				oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue(), (int) params[QUANTIZE_PARAM].getValue()) * vco1_cv;
 				} else {
 					oscillators[i].freq = quantize(params[OSC_PARAM + i].getValue(), (int) params[QUANTIZE_PARAM].getValue());
 				}
