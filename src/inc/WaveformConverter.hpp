@@ -11,6 +11,7 @@ class WaveformConverter {
 		GateProcessor gate;
 
 	public:
+		// converts input waveform to sawtooth wave
 		float toSaw(float value, float freq, float sampleTime) {
 			gate.set(value);
 

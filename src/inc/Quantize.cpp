@@ -6,18 +6,22 @@ const double A4_FREQUENCY = 440.0;
 const int A4_MIDI_NOTE = 69; 
 const double C4_FREQUENCY = 261.626;
 
+// converts freq in hertz to midi note for 12 tone system
 double frequencyToMidi12(double frequency) {
     return A4_MIDI_NOTE + 12.0 * std::log2(frequency / A4_FREQUENCY);
 }
 
+// converts midi note to frequency value for 12 tone system
 double midiToFrequency12(double midiNote) {
     return A4_FREQUENCY * std::pow(2.0, (midiNote - A4_MIDI_NOTE) / 12.0);
 }
 
+// converts freq in hertz to midi note for 8 tone system
 double frequencyToMidi8(double frequency) {
     return A4_MIDI_NOTE + 8.0 * std::log2(frequency / A4_FREQUENCY);
 }
 
+// converts midi note to frequency value for 8 tone system
 double midiToFrequency8(double midiNote) {
     return A4_FREQUENCY * std::pow(2.0, (midiNote - A4_MIDI_NOTE) / 8.0);
 }

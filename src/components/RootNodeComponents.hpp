@@ -11,17 +11,16 @@ struct PushButton5 : SvgSwitch {
         addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_4.svg")));
         addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Components/PushButton5_5.svg")));
 
-        // Disable shadow for cleaner appearance
         shadow->opacity = 0.0f;
     }
 
     // Handle state cycling
      void onButton(const event::Button& e) override {
-        if (e.action == GLFW_PRESS) {  // Only handle button press events
+        if (e.action == GLFW_PRESS) { 
             // Cycle through the 5 states
             float currentValue = getParamQuantity()->getValue();
-            int nextState = ((int)currentValue + 1) % 5; // Increment state and wrap back to 0
-            getParamQuantity()->setValue((float)nextState); // Update state
+            int nextState = ((int)currentValue + 1) % 5;
+            getParamQuantity()->setValue((float)nextState);
         }
     }
 };

@@ -26,7 +26,7 @@ struct SquareWaveGenerator {
         if (phase >= 1.0f)
             phase -= 1.0f;
 
-        // Calculate square wave (±5) based on phase
+        // Calculate square wave based on phase
         sqrValue = phase < dutyCycle ? 5.f : -5.f;
         sqrValue += sqrMinBlep.process();
     }
@@ -107,6 +107,7 @@ struct SubharmonicGenerator : Module {
 		}
 	}
 
+	// quantize notes based on switch position
 	float quantize(float freq, int mode) {
 		switch (mode) {
 			case 0:
@@ -125,6 +126,7 @@ struct SubharmonicGenerator : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		// process input values
 		float vco1_cv = pow(2.f, inputs[VCO1_INPUT].getVoltage());
 		float vco2_cv = pow(2.f, inputs[VCO2_INPUT].getVoltage());
 		int vco1_sub_cv = std::floor(rescale(inputs[VCO1_SUB_INPUT].getVoltage(), -5, 5, 0.f, 16.f));
@@ -216,6 +218,7 @@ struct SubharmonicGenerator : Module {
 
 		}
 
+		// accumulate output voltage
 		out += outputs[VCO1_OUTPUT].getVoltage();
 		out += outputs[VCO2_OUTPUT].getVoltage();
 		out += outputs[VCO1_SUB1_OUTPUT].getVoltage();
